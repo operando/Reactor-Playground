@@ -120,6 +120,20 @@ public class Main {
         stringUnicastProcessor.onComplete();
         stringUnicastProcessor.onNext("test3");
 
+        Flux.range(1, 4)
+                .map(i -> {
+                    if (i <= 3)
+                        return "item: " + i;
+                    else {
+                        System.out.println(">> Exception occurs on map()");
+                        throw new RuntimeException();
+                    }
+                })
+                .retry(2)
+                .onErrorMap(throwable -> new Exception())
+//                .doOnError(e -> System.out.println("doOnError: " + e))
+                .onErrorReturn("error value")
+                .subscribe(System.out::println);
     }
 
     public static class Test {
